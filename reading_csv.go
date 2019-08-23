@@ -10,9 +10,7 @@ import (
 )
 
 func basicCheck(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
+
 }
 
 func parseCsv(csvFile *os.File) []map[string]string {
@@ -20,19 +18,23 @@ func parseCsv(csvFile *os.File) []map[string]string {
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 	reader.Comma = '\t'
 
-	headers, err := reader.Read()
-	if err == io.EOF {
+	headers, e := reader.Read()
+	if e == io.EOF {
 		return sheetParsed
 	}
-	basicCheck(err)
+	if e != nil {
+		log.Fatal(e)
+	}
 
 	for {
 		row_map := make(map[string]string)
-		record, err := reader.Read()
-		if err == io.EOF {
+		record, e := reader.Read()
+		if e == io.EOF {
 			break
 		}
-		basicCheck(err)
+		if e != nil {
+			log.Fatal(e)
+		}
 		for num, cell := range record {
 			row_map[headers[num]] = cell
 		}
@@ -43,8 +45,10 @@ func parseCsv(csvFile *os.File) []map[string]string {
 
 func main() {
 	filepath := "/home/raleigh/Downloads/cleaned-BookstoreList_1.csv"
-	csvFile, err := os.Open(filepath)
-	basicCheck(err)
+	csvFile, e := os.Open(filepath)
+	if e != nil {
+		log.Fatal(e)
+	}
 	sheetParsed := parseCsv(csvFile)
 	fmt.Println(sheetParsed)
 }
