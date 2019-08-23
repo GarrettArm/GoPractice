@@ -9,27 +9,30 @@ import (
 	"os"
 )
 
-func parseCsv() []map[string]string {
+func basicCheck(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
+func parseCsv(csvFile *os.File) []map[string]string {
 	sheetParsed := make([]map[string]string, 0)
-	csvFile, _ := os.Open("/home/raleigh/Downloads/cleaned-BookstoreList_1.csv")
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 	reader.Comma = '\t'
+
 	headers, err := reader.Read()
 	if err == io.EOF {
 		return sheetParsed
 	}
-	if err != nil {
-		log.Fatal(err)
-	}
+	basicCheck(err)
+
 	for {
+		row_map := make(map[string]string)
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		row_map := make(map[string]string)
+		basicCheck(err)
 		for num, cell := range record {
 			row_map[headers[num]] = cell
 		}
@@ -39,6 +42,9 @@ func parseCsv() []map[string]string {
 }
 
 func main() {
-	sheetParsed := parseCsv()
+	filepath := "/home/raleigh/Downloads/cleaned-BookstoreList_1.csv"
+	csvFile, err := os.Open(filepath)
+	basicCheck(err)
+	sheetParsed := parseCsv(csvFile)
 	fmt.Println(sheetParsed)
 }
