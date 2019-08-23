@@ -9,10 +9,6 @@ import (
 	"os"
 )
 
-func basicCheck(e error) {
-
-}
-
 func parseCsv(csvFile *os.File) []map[string]string {
 	sheetParsed := make([]map[string]string, 0)
 	reader := csv.NewReader(bufio.NewReader(csvFile))
