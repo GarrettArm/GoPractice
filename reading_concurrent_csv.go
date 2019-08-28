@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -37,13 +38,36 @@ func parseCsv(csvFile *os.File) []map[string]string {
 	return sheetParsed
 }
 
-func main() {
-	filepath := "/home/raleigh/Downloads/cleaned-BookstoreList_1.csv"
-	csvFile, e := os.Open(filepath)
+func findCsvs(filepath string) []string {
+	var csvs []string
+	files, e := ioutil.ReadDir(filepath)
 	if e != nil {
 		log.Fatal(e)
 	}
+	for _, file := range files {
+		fullpath := filepath + "/" + file.Name()
+		csvs = append(csvs, fullpath)
+	}
+
+	return csvs
+}
+
+func readCsv(filepath string, ch chan<- []map[string]string) {
+	csvFile, e := os.Open(filepath)
 	defer csvFile.Close()
-	sheetParsed := parseCsv(csvFile)
-	fmt.Println(sheetParsed)
+	if e != nil {
+		log.Fatal(e)
+	}
+	ch <- parseCsv(csvFile)
+	return
+}
+
+func main() {
+	ch := make(chan []map[string]string)
+	filepath := "/home/raleigh/Desktop/trash/csv_trash"
+	csvfiles := findCsvs(filepath)
+	for _, file := range csvfiles {
+		go readCsv(file, ch)
+		fmt.Println(<-ch)
+	}
 }
