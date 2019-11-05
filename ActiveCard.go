@@ -60,12 +60,17 @@ func scanStdin() string {
 }
 
 func main() {
+	fmt.Println("\n*********************\nWelcome to ActiveCard\n*********************\n\nScan a Tigercard, we'll check if the account is active.\n\n(If you lose connection, try clicking on this display window and rescanning.)\n\n")
 	for {
 		input := scanStdin()
 		if input != "" {
 			user := QueryAPI(input)
 			expired := isExpired(user)
-			fmt.Println(expired)
+			if expired {
+				fmt.Println("Not authorized patron")
+			} else {
+				fmt.Println("authorized patron")
+			}
 		}
 	}
 }
